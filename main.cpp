@@ -5,9 +5,11 @@ int main()
 {
 	Hotel t;
 
-	t.getRoom(201).setBeds(3);
+	t.checkin(201, "2000-01-01", "2000-01-06", -1);
+	t.checkin(106, "2000-03-01", "2000-04-08", -1);
 
-	Hotel t2 = t;
+	//t.report("2000-01-01", "2001-01-01");
+	t.available("2000-01-01", "2001-01-01", 1);
 
-	t2.print();
+	//t.print();
 }

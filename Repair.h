@@ -24,7 +24,6 @@ public:
 	void setTo(const char*);
 	void setNote(const char*);
 
-	bool intersect(const Repair&);
 	void print();
 	void free();
 	void copy(const Repair&);

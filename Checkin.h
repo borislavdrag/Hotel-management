@@ -7,7 +7,6 @@ class Checkin
 	char* to;
 	char* note;
 	int guests;
-	int days;
 
 public:
 	Checkin();
@@ -28,7 +27,6 @@ public:
 	void setNote(const char*);
 	void setGuests(int);
 
-	bool intersect(const Checkin&);
 	void print();
 	void copy(const Checkin&);
 	void free();

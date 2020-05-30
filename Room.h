@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cstring>
 #include <fstream>
+#include <cmath>
 
 #define DEFAULT_BEDS 2
 

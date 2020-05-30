@@ -19,7 +19,8 @@ public:
 	Hotel& operator=(const Hotel&);
 
 	void report(const char*, const char*) const;
-	void available(const char*, const char*) const;
+	void available(const char*) const;
+	void available(const char*, const char*, int) const;
 	Room& getRoom(int id);
 
 	void checkin(int, const char*, const char*, int, const char* = "");
