@@ -218,7 +218,7 @@ void Hotel::checkin(int id, const char* from, const char* to, int guests, const 
 	checkIns[nCheckIns].setTo(to);
 	checkIns[nCheckIns].setNote(note);
 	if (guests == -1)
-		checkIns[nCheckIns].setGuests(DEFAULT_BEDS);
+		checkIns[nCheckIns].setGuests(getRoom(id).getBeds());
 	else
 		checkIns[nCheckIns].setGuests(guests);
 
@@ -277,6 +277,28 @@ void Hotel::free()
 }
 bool Hotel::save(std::fstream& out)
 {
+	if (!out.good())
+		return 0;
+	
+	out << nCheckIns << ' ' << nRepairs << '\n';
+	for (int i = 0; i < CAPACITY; i++)
+		out << rooms[i].getId() << ' ' << rooms[i].getBeds() << '\n';
+	for (int i = 0; i < nCheckIns; i++)
+	{
+		out << checkIns[i].getId() << ' ';
+		out << checkIns[i].getGuests() << ' ';
+		out << checkIns[i].getFrom() << ' ';
+		out << checkIns[i].getTo() << ' ';
+		out << checkIns[i].getNote() << '\n';
+	}
+	for (int i = 0; i < nRepairs; i++)
+	{
+		out << repairs[i].getId() << ' ';
+		out << repairs[i].getFrom() << ' ';
+		out << repairs[i].getTo() << ' ';
+		out << repairs[i].getNote() << '\n';
+	}
+
 	return 1;
 }
 bool Hotel::load(std::fstream& in)

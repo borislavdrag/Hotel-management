@@ -1,3 +1,3 @@
 ﻿  Hotel.cpp
-C:\Code\Uni\OOP Hotel management\OOP Hotel management\Hotel.cpp(202): warning C4715: 'Hotel::getRoom': not all control paths return a value
+C:\Code\Uni\OOP Hotel management\OOP Hotel management\Hotel.cpp(201): warning C4715: 'Hotel::getRoom': not all control paths return a value
   OOP Hotel management.vcxproj -> C:\Code\Uni\OOP Hotel management\Debug\OOP Hotel management.exe
