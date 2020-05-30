@@ -160,6 +160,7 @@ void Hotel::report(const char* from, const char* to) const
 			std::cout << "Room " << 100 * (i / 10 + 1) + i % 10 << 
 			" has been used for " << roomUsed[i] << " days." << std::endl;
 	}
+	std::cout << std::endl;
 }
 void Hotel::available(const char* from, const char* to, int beds) const
 {
@@ -187,6 +188,7 @@ void Hotel::available(const char* from, const char* to, int beds) const
 		if(roomsAvailable[i] == 0 && rooms[i].getBeds() >= beds)
 			std::cout << "Room " << 100 * (i / 10 + 1) + i % 10 <<
 			" is free with " << rooms[i].getBeds() << " beds." << std::endl;
+	std::cout << std::endl;
 }
 void Hotel::available(const char* date) const
 {
@@ -250,6 +252,7 @@ void Hotel::print()
 	std::cout << "The hotel has " << CAPACITY << " rooms:" << std::endl;
 	for (int i = 0; i < CAPACITY; i++)
 		rooms[i].print();
+	std::cout << std::endl;
 }
 void Hotel::copy(const Hotel& other)
 {
@@ -285,6 +288,7 @@ bool Hotel::save(std::fstream& out)
 		out << rooms[i].getId() << ' ' << rooms[i].getBeds() << '\n';
 	for (int i = 0; i < nCheckIns; i++)
 	{
+		out << strlen(checkIns[i].getNote()) << ' ';
 		out << checkIns[i].getId() << ' ';
 		out << checkIns[i].getGuests() << ' ';
 		out << checkIns[i].getFrom() << ' ';
@@ -293,6 +297,7 @@ bool Hotel::save(std::fstream& out)
 	}
 	for (int i = 0; i < nRepairs; i++)
 	{
+		out << strlen(repairs[i].getNote()) << ' ';
 		out << repairs[i].getId() << ' ';
 		out << repairs[i].getFrom() << ' ';
 		out << repairs[i].getTo() << ' ';
@@ -303,5 +308,90 @@ bool Hotel::save(std::fstream& out)
 }
 bool Hotel::load(std::fstream& in)
 {
+	if (!in.good())
+		return 0;
+
+	int nReps, nChecks;
+	in >> nChecks >> nReps;
+
+	Room* roomsNew = new Room[CAPACITY];
+	Checkin* checkInsNew = new Checkin[nChecks];
+	Repair* repairsNew = new Repair[nReps];
+
+	for (int i = 0; i < CAPACITY; i++)
+	{
+		int idNew, bedsNew;
+		in >> idNew >> bedsNew;
+		roomsNew[i].setId(idNew);
+		roomsNew[i].setBeds(bedsNew);
+	}
+	for (int i = 0; i < nChecks; i++)
+	{
+		char a;
+		int size, idNew, guestsNew;
+		in >> size;
+
+		char* fromNew = new char[11];
+		char* toNew = new char[11];
+		char* noteNew = new char[size + 1];
+
+		in >> idNew >> guestsNew;
+		std::cout << "DEBUG1---" << guestsNew << std::endl;
+		in >> fromNew;
+		fromNew[11] = '\0';
+		in >> toNew;
+		toNew[11] = '\0';
+		in.get(a);
+		in.getline(noteNew, size + 3);
+		//in.ignore();
+		/*in >> noteNew;
+		noteNew[size] = '\0';*/
+		std::cout << "DEBUG2---" << noteNew << std::endl;
+
+		checkInsNew[i].setId(idNew);
+		checkInsNew[i].setGuests(guestsNew);
+		checkInsNew[i].setFrom(fromNew);
+		checkInsNew[i].setTo(toNew);
+		checkInsNew[i].setNote(noteNew);
+
+		std::cout << "DEBUG3---" << checkInsNew[i].getNote() << std::endl;
+	}
+	for (int i = 0; i < nReps; i++)
+	{
+		char a;
+		int size, idNew;
+		in >> size;
+
+		char* fromNew = new char[11];
+		char* toNew = new char[11];
+		char* noteNew = new char[size + 1];
+
+		in >> idNew;
+		in >> fromNew;
+		fromNew[11] = '\0';
+		in >> toNew;
+		toNew[11] = '\0';
+		/*in >> noteNew;
+		noteNew[size] = '\0';*/
+		in.get(a);
+		in.getline(noteNew, size + 3);
+
+		repairsNew[i].setId(idNew);
+		repairsNew[i].setFrom(fromNew);
+		repairsNew[i].setTo(toNew);
+		repairsNew[i].setNote(noteNew);
+	}
+
+	delete[] this->rooms;
+	delete[] this->repairs;
+	delete[] this->checkIns;
+
+	this->nCheckIns = nChecks;
+	this->nRepairs = nReps;
+
+	this->rooms = roomsNew;
+	this->checkIns = checkInsNew;
+	this->repairs = repairsNew;
+
 	return 1;
 }
