@@ -5,6 +5,7 @@
 #include <cstring>
 #include <fstream>
 #include <cmath>
+#include <ctime>
 
 #define DEFAULT_BEDS 2
 

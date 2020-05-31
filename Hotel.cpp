@@ -164,14 +164,14 @@ void Hotel::report(const char* from, const char* to) const
 }
 void Hotel::available(const char* from, const char* to, int beds) const
 {
-	int roomsAvailable[CAPACITY] = {};
+	int roomsAvailable[CAPACITY] = {0};
 
 	for (int i = 0; i < nRepairs; i++)
 	{
 		int properId = repairs[i].getId();
 		int simpleId = 10 * (properId / 100 - 1) + properId % 100;
 		if (!(compareDates(from, repairs[i].getTo()) < 0 || compareDates(to, repairs[i].getFrom()) > 0))
-		{
+		{	
 			roomsAvailable[simpleId] = 1;
 		}
 	}
@@ -185,14 +185,33 @@ void Hotel::available(const char* from, const char* to, int beds) const
 		}
 	}
 	for (int i = 0; i < CAPACITY; i++)
-		if(roomsAvailable[i] == 0 && rooms[i].getBeds() >= beds)
+	{
+		if (roomsAvailable[i] == 0 && rooms[i].getBeds() >= beds)
+		{
 			std::cout << "Room " << 100 * (i / 10 + 1) + i % 10 <<
-			" is free with " << rooms[i].getBeds() << " beds." << std::endl;
+				" is free with " << rooms[i].getBeds() << " beds." << std::endl;
+		}
+	}
 	std::cout << std::endl;
 }
 void Hotel::available(const char* date) const
 {
-	available(date, date, 0);
+	if (strcmp(date, "") == 0)
+	{
+		time_t timer;
+		char dateNow[10];
+		struct tm* tm_info;
+
+		timer = time(NULL);
+		tm_info = localtime(&timer);
+
+		strftime(dateNow, 10, "%Y-%m-%d", tm_info);
+		available(dateNow, dateNow, 0);
+	}
+	else
+	{
+		available(date, date, 0);
+	}
 }
 Room& Hotel::getRoom(int id)
 {
@@ -205,45 +224,111 @@ Room& Hotel::getRoom(int id)
 //"Setters"
 void Hotel::checkin(int id, const char* from, const char* to, int guests, const char* note)
 {
-	if (this->checkIns == nullptr)
-		this->checkIns = new Checkin[1];
+	bool n = false;
+	for (int i = 0; i < nCheckIns; i++)
+	{
+		if (((compareDates(from, checkIns[i].getFrom()) <= 0 && compareDates(from, checkIns[i].getTo()) >= 0) ||
+			(compareDates(to, checkIns[i].getFrom()) <= 0 && compareDates(to, checkIns[i].getTo()) >= 0))
+			&& (checkIns[i].getId() == id))
+		{
+			n = true;
+			break;
+		}
+	}
+	for (int i = 0; i < nRepairs; i++)
+	{
+		if ((compareDates(from, repairs[i].getFrom()) <= 0 && compareDates(from, repairs[i].getTo()) >= 0) ||
+			(compareDates(to, repairs[i].getFrom()) <= 0 && compareDates(to, repairs[i].getTo()) >= 0)
+			&& (repairs[i].getId() == id))
+		{
+			n = true;
+			break;
+		}
+	}
+	if (n)
+	{
+		std::cout << "Unavailable" << std::endl;
+	}
 	else
 	{
-		Checkin* temp = new Checkin[nCheckIns + 1];
-		for (int i = 0; i < nCheckIns; i++)
-			temp[i] = this->checkIns[i];
-		delete[] this->checkIns;
-		this->checkIns = temp;
-	}
-	checkIns[nCheckIns].setId(id);
-	checkIns[nCheckIns].setFrom(from);
-	checkIns[nCheckIns].setTo(to);
-	checkIns[nCheckIns].setNote(note);
-	if (guests == -1)
-		checkIns[nCheckIns].setGuests(getRoom(id).getBeds());
-	else
-		checkIns[nCheckIns].setGuests(guests);
+		if (this->checkIns == nullptr)
+			this->checkIns = new Checkin[1];
+		else
+		{
+			Checkin* temp = new Checkin[nCheckIns + 1];
+			for (int i = 0; i < nCheckIns; i++)
+				temp[i] = this->checkIns[i];
+			delete[] this->checkIns;
+			this->checkIns = temp;
+		}
+		checkIns[nCheckIns].setId(id);
+		checkIns[nCheckIns].setFrom(from);
+		checkIns[nCheckIns].setTo(to);
+		checkIns[nCheckIns].setNote(note);
+		if (guests == -1)
+			checkIns[nCheckIns].setGuests(getRoom(id).getBeds());
+		else
+			checkIns[nCheckIns].setGuests(guests);
 
-	nCheckIns++;
+		nCheckIns++;
+	}
 }
 void Hotel::repair(int id, const char* from, const char* to, const char* note)
 {
-	if (this->repairs == nullptr)
-		this->repairs = new Repair[1];
+	bool n = false;
+	for (int i = 0; i < nCheckIns; i++)
+	{
+		if ((compareDates(from, checkIns[i].getFrom()) <= 0 && compareDates(from, checkIns[i].getTo()) >= 0) ||
+			(compareDates(to, checkIns[i].getFrom()) <= 0 && compareDates(to, checkIns[i].getTo()) >= 0)
+			&& (checkIns[i].getId() == id))
+		{
+			n = true;
+			break;
+		}
+	}
+	if (n)
+	{
+		std::cout << "Already booked" << std::endl;
+	}
 	else
 	{
-		Repair* temp = new Repair[nRepairs + 1];
-		for (int i = 0; i < nRepairs; i++)
-			temp[i] = this->repairs[i];
-		delete[] this->repairs;
-		this->repairs = temp;
-	}
-	repairs[nRepairs].setId(id);
-	repairs[nRepairs].setFrom(from);
-	repairs[nRepairs].setTo(to);
-	repairs[nRepairs].setNote(note);
+		if (this->repairs == nullptr)
+			this->repairs = new Repair[1];
+		else
+		{
+			Repair* temp = new Repair[nRepairs + 1];
+			for (int i = 0; i < nRepairs; i++)
+				temp[i] = this->repairs[i];
+			delete[] this->repairs;
+			this->repairs = temp;
+		}
+		repairs[nRepairs].setId(id);
+		repairs[nRepairs].setFrom(from);
+		repairs[nRepairs].setTo(to);
+		repairs[nRepairs].setNote(note);
 
-	nRepairs++;
+		nRepairs++;
+	}
+}
+void Hotel::checkout(int id)
+{
+	time_t timer;
+	char dateNow[10];
+	struct tm* tm_info;
+
+	timer = time(NULL);
+	tm_info = localtime(&timer);
+
+	strftime(dateNow, 10, "%Y-%m-%d", tm_info);
+
+	for (int i = 0; i < nCheckIns; i++)
+	{
+		if ((this->checkIns[i].getId() == id) && (compareDates(this->checkIns[i].getFrom(), dateNow) >= 0)
+			&& (compareDates(this->checkIns[i].getTo(), dateNow) <= 0))
+		{
+			checkIns[i].setTo(dateNow);
+		}
+	}
 }
 
 //Other functions
@@ -336,17 +421,12 @@ bool Hotel::load(std::fstream& in)
 		char* noteNew = new char[size + 1];
 
 		in >> idNew >> guestsNew;
-		std::cout << "DEBUG1---" << guestsNew << std::endl;
 		in >> fromNew;
 		fromNew[11] = '\0';
 		in >> toNew;
 		toNew[11] = '\0';
 		in.get(a);
 		in.getline(noteNew, size + 3);
-		//in.ignore();
-		/*in >> noteNew;
-		noteNew[size] = '\0';*/
-		std::cout << "DEBUG2---" << noteNew << std::endl;
 
 		checkInsNew[i].setId(idNew);
 		checkInsNew[i].setGuests(guestsNew);
@@ -354,7 +434,6 @@ bool Hotel::load(std::fstream& in)
 		checkInsNew[i].setTo(toNew);
 		checkInsNew[i].setNote(noteNew);
 
-		std::cout << "DEBUG3---" << checkInsNew[i].getNote() << std::endl;
 	}
 	for (int i = 0; i < nReps; i++)
 	{
@@ -371,8 +450,6 @@ bool Hotel::load(std::fstream& in)
 		fromNew[11] = '\0';
 		in >> toNew;
 		toNew[11] = '\0';
-		/*in >> noteNew;
-		noteNew[size] = '\0';*/
 		in.get(a);
 		in.getline(noteNew, size + 3);
 

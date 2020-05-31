@@ -25,6 +25,7 @@ public:
 
 	void checkin(int, const char*, const char*, int, const char* = "");
 	void repair(int, const char*, const char*, const char* = "");
+	void checkout(int);
 
 	void print();
 	void free();

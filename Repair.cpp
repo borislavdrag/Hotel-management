@@ -12,9 +12,9 @@ Repair::Repair(int id, const char* from, const char* to, const char* note = "")
 {
     this->id = id;
 
-    this->from = new char[strlen(from)];
-    this->to = new char[strlen(to)];
-    this->note = new char[strlen(note)];
+    this->from = new char[strlen(from)+1];
+    this->to = new char[strlen(to)+1];
+    this->note = new char[strlen(note)+1];
     strcpy(this->from, from);
     strcpy(this->to, to);
     strcpy(this->note, note);

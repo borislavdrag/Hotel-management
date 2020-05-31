@@ -15,9 +15,9 @@ Checkin::Checkin(int id, const char* from, const char* to, int guests, const cha
     if (guests < 1 || guests > DEFAULT_BEDS)
         this->guests = DEFAULT_BEDS;
 
-    this->from = new char[strlen(from)];
-    this->to = new char[strlen(to)];
-    this->note = new char[strlen(note)];
+    this->from = new char[strlen(from)+1];
+    this->to = new char[strlen(to)+1];
+    this->note = new char[strlen(note)+1];
     strcpy(this->from, from);
     strcpy(this->to, to);
     strcpy(this->note, note);
